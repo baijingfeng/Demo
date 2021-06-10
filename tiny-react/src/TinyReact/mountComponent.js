@@ -6,6 +6,7 @@ import buildClassComponent from "./buildClassComponent";
 
 export default function mountComponent(virtualDOM, container, oldDOM) {
   let nextVirtualDOM = null;
+  let component = null;
   // 判断是类组件还是函数组件
   if (isFunctionComponent(virtualDOM)) {
     // 函数组件
@@ -13,15 +14,19 @@ export default function mountComponent(virtualDOM, container, oldDOM) {
   } else {
     // 类组件
     nextVirtualDOM = buildClassComponent(virtualDOM);
+    component = nextVirtualDOM.component;
   }
-  console.log(
-    "%c 🍡 nextVirtualDOM: ",
-    "font-size:20px;background-color: #2EAFB0;color:#fff;",
-    nextVirtualDOM
-  );
+
   if (isFunction(nextVirtualDOM)) {
     mountComponent(nextVirtualDOM, container, oldDOM);
   } else {
     mountNativeElement(nextVirtualDOM, container, oldDOM);
+  }
+
+  if (component) {
+    component.componentDidMount();
+    if (component.props && component.props.ref) {
+      component.props.ref(component);
+    }
   }
 }
