@@ -25,14 +25,68 @@ export default function diff(virtualDOM, container, oldDOM) {
       // 更新元素属性
       updateNodeElement(oldDOM, virtualDOM, oldVirtualDOM);
     }
-    virtualDOM.children.forEach((child, index) => {
-      diff(child, oldDOM, oldDOM.childNodes[index]);
-    });
+
+    // 1. 将拥有 key 属性的子元素放置在一个单独的对象中
+    let keyElements = {};
+
+    for (let i = 0; i < oldDOM.childNodes.length; i++) {
+      let domElement = oldDOM.childNodes[i];
+      if (domElement.nodeType === 1) {
+        let key = domElement.getAttribute("key");
+        if (key) {
+          keyElements[key] = domElement;
+        }
+      }
+    }
+
+    let hasNoKey = Object.keys(keyedElements).length === 0;
+    if (hasNoKey) {
+      // 索引方式对比子节点
+      virtualDOM.children.forEach((child, index) => {
+        diff(child, oldDOM, oldDOM.childNodes[index]);
+      });
+    } else {
+      // 2. 循环 virtualDOM 的子元素的 key 属性
+      virtualDOM.children.forEach((child, i) => {
+        let key = child.props.key;
+        if (key) {
+          let domElement = keyedElements[key];
+          if (domElement) {
+            // 3. 看看当前位置的元素是不是我们的期望元素
+            if (oldDOM.childNodes[i] && oldDOM.childNodes[i] !== domElement) {
+              oldDOM.insertBefore(domElement, oldDOM.childNodes[i]);
+            }
+          } else {
+            // 新增元素
+            mountElement(child, oldDOM, oldDOM.childNodes[i]);
+          }
+        }
+      });
+    }
+
     // 删除多余节点
     let oldChildNodes = oldDOM.childNodes;
     if (oldChildNodes.length > virtualDOM.children.length) {
-      for (let i = oldChildNodes.length - 1; i > virtualDOM.children.length - 1; i--) {
-        unmountNode(oldChildNodes[i]);
+      if (hasNoKey) {
+        for (let i = oldChildNodes.length - 1; i > virtualDOM.children.length - 1; i--) {
+          unmountNode(oldChildNodes[i]);
+        }
+      } else {
+        // 通过 key 属性删除节点
+        for (let i = 0; i < oldChildNodes.length; i++) {
+          let oldChild = oldChildNodes[i];
+          let oldChildKey = oldChild._virtualDOM.porps.key;
+          let found = false;
+          for (let n = 0; n < virtualDOM.children.length; n++) {
+            if (oldChildKey === virtualDOM.children[n].props.key) {
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            unmountNode(oldChild);
+          }
+        }
       }
     }
   }
