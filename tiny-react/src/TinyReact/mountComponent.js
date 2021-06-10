@@ -4,7 +4,7 @@ import mountNativeElement from "./mountNativeElement";
 import buildFunctionComponent from "./buildFunctionComponent";
 import buildClassComponent from "./buildClassComponent";
 
-export default function mountComponent(virtualDOM, container) {
+export default function mountComponent(virtualDOM, container, oldDOM) {
   let nextVirtualDOM = null;
   // 判断是类组件还是函数组件
   if (isFunctionComponent(virtualDOM)) {
@@ -20,8 +20,8 @@ export default function mountComponent(virtualDOM, container) {
     nextVirtualDOM
   );
   if (isFunction(nextVirtualDOM)) {
-    mountComponent(nextVirtualDOM, container);
+    mountComponent(nextVirtualDOM, container, oldDOM);
   } else {
-    mountNativeElement(nextVirtualDOM, container);
+    mountNativeElement(nextVirtualDOM, container, oldDOM);
   }
 }
