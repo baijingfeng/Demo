@@ -46,11 +46,11 @@ const modifyDOM = (
   </div>
 );
 
-TinyReact.render(virtualDOM, root);
+// TinyReact.render(virtualDOM, root);
 
-setTimeout(() => {
-  TinyReact.render(modifyDOM, root);
-}, 2000);
+// setTimeout(() => {
+//   TinyReact.render(modifyDOM, root);
+// }, 2000);
 
 // console.log(virtualDOM);
 
@@ -71,17 +71,31 @@ function Header(props) {
 class Alert extends TinyReact.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      title: "default Title",
+    };
+
+    this.handleClick = this.handleClick.bind(this);
   }
+
+  handleClick() {
+    this.setState({
+      title: "Modify title",
+    });
+  }
+
   render() {
     return (
       <div>
         {this.props.name} : {this.props.age}
         Alert 类组件 <Header text="HEllo" />
+        <div>{this.state.title}</div>
+        <button onClick={this.handleClick}>改变Title</button>
       </div>
     );
   }
 }
 
-// TinyReact.render(<Alert text="HEllo" name="张三" age={20} />, root);
+TinyReact.render(<Alert text="HEllo" name="张三" age={20} />, root);
 
 // console.log(<Header />);

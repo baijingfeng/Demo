@@ -2,7 +2,7 @@ import isFunction from "./isFunction";
 import isFunctionComponent from "./isFunctionComponent";
 import mountNativeElement from "./mountNativeElement";
 import buildFunctionComponent from "./buildFunctionComponent";
-import buildClassComountComponent from "./buildClassComountComponent";
+import buildClassComponent from "./buildClassComponent";
 
 export default function mountComponent(virtualDOM, container) {
   let nextVirtualDOM = null;
@@ -12,7 +12,7 @@ export default function mountComponent(virtualDOM, container) {
     nextVirtualDOM = buildFunctionComponent(virtualDOM);
   } else {
     // 类组件
-    nextVirtualDOM = buildClassComountComponent(virtualDOM);
+    nextVirtualDOM = buildClassComponent(virtualDOM);
   }
   console.log(
     "%c 🍡 nextVirtualDOM: ",
