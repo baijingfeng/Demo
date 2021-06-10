@@ -1,11 +1,20 @@
 import diff from "./diff";
 
 export default function updateComponent(virtualDOM, oldComponent, oldDOM, container) {
-  // 组件更新
-  oldComponent.updateProps(virtualDOM.props);
+  const nextProps = virtualDOM.props;
+  const prevProps = oldComponent.props;
+  oldComponent.componentWillReceiveProps(nextProps);
 
-  const nextVirtualDOM = oldComponent.render();
-  nextVirtualDOM.component = oldComponent;
+  if (oldComponent.shouldComponentUpdate(nextProps)) {
+    oldComponent.componentWillUpdate(nextProps);
+    // 组件更新
+    oldComponent.updateProps(nextProps);
 
-  diff(nextVirtualDOM, container, oldDOM);
+    const nextVirtualDOM = oldComponent.render();
+    nextVirtualDOM.component = oldComponent;
+
+    diff(nextVirtualDOM, container, oldDOM);
+
+    oldComponent.componentDidUpdate(prevProps);
+  }
 }
