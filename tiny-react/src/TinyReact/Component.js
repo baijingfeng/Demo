@@ -24,4 +24,9 @@ export default class Component {
   getDOM() {
     return this._dom;
   }
+
+  updateProps(props) {
+    this.props = props;
+  }
+
 }
